@@ -10,9 +10,9 @@ then
 	ms5611 start
 fi
 
-mpu9250 -s -R 0 start
+mpu9250 -s start
 
-ist8310 -I -R 4 start
+ist8310 -I -R 14 start
 
 ll40ls start -X
 

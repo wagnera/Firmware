@@ -100,9 +100,9 @@ if param compare SENS_EXT_I2C_PRB 1
 then
 	# compasses
 	ak09916 -X -R 6 start # external AK09916 (Here2) is rotated 270 degrees yaw
-	hmc5883 -T -X start
+	hmc5883 -X -T start
 	ist8308 -X start
-	ist8310 -X start
+	ist8310 -X -R 12 start # typically (but not always) mounted on bottom of board
 	lis2mdl -X start
 	lis3mdl -X start
 	qmc5883 -X start

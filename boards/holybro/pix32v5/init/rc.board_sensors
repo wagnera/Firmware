@@ -5,18 +5,16 @@
 
 adc start
 
-# Internal SPI bus ICM-20602
-icm20602 -s -R 2 start
+# SPI1 IMUs
+icm20689 -s -b 1 -R 2 start
+bmi055 -A -b 1 -R 2 -s start
+bmi055 -G -b 1 -R 2 -s start
 
-# Internal SPI bus ICM-20689
-icm20689 -s -R 2 start
+# SPI4 internal barometer
+ms5611 -s -b 4 start
 
-# Internal SPI bus BMI055 accel/gyro
-bmi055 -A -R 2 -s start
-bmi055 -G -R 2 -s start
+# I2C3 internal compass
+ist8310 -I -b 3 -R 10 start
 
-# internal compass
-ist8310 -I start
-
-# Baro on internal SPI
-ms5611 -s start
+# External compass: standard Holybro Pixhawk 4 or CUAV V5 GPS/compass puck (with lights, safety button, and buzzer)
+ist8310 -X -b 1 -R 10 start
