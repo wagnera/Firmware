@@ -107,7 +107,7 @@ int SMBus::write_word(const uint8_t cmd_code, uint16_t data)
 	return result;
 }
 
-int SMBus::block_read(const uint8_t cmd_code, void *data, const uint8_t length, bool use_pec)
+int SMBus::block_read(const uint8_t cmd_code, void *data, const uint8_t length, const bool use_pec)
 {
 	unsigned byte_count = 0;
 	// addr(wr), cmd_code, addr(r), byte_count, data (32 bytes max), pec
@@ -140,7 +140,7 @@ int SMBus::block_read(const uint8_t cmd_code, void *data, const uint8_t length, 
 	return result;
 }
 
-int SMBus::block_write(const uint8_t cmd_code, void *data, uint8_t byte_count, bool use_pec)
+int SMBus::block_write(const uint8_t cmd_code, const void *data, uint8_t byte_count, const bool use_pec)
 {
 	// cmd code[1], byte count[1], data[byte_count] (32max), pec[1] (optional)
 	uint8_t buf[32 + 2];
@@ -165,7 +165,6 @@ int SMBus::block_write(const uint8_t cmd_code, void *data, uint8_t byte_count, b
 	}
 
 	if (i == 10 || result) {
-		//PX4_WARN("Block_write failed %d times", i); removed, it potentially floating the shell
 		result = -EINVAL;
 	}
 
