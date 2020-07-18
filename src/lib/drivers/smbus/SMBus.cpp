@@ -36,6 +36,7 @@
  * SMBus v2.0 protocol implementation.
  *
  * @author Jacob Dahl <dahl.jakejacob@gmail.com>
+ * @author Bazooka Joe <BazookaJoe1900@gmail.com>
  *
  * TODO
  *  - Enable SMBus mode at the NuttX level. This may be tricky sharing the bus with i2c.
@@ -43,11 +44,19 @@
  *  - Add remaining SMBus protocol messages as needed
  */
 
+#ifdef __NUTTX
+#include <crc8.h>
+#endif
 #include "SMBus.hpp"
 
 SMBus::SMBus(int bus_num, uint16_t address) :
 	I2C(DRV_BAT_DEVTYPE_SMBUS, MODULE_NAME, bus_num, address, 100000)
 {
+}
+
+SMBus::~SMBus()
+{
+	perf_free(_interface_errors);
 }
 
 int SMBus::read_word(const uint8_t cmd_code, uint16_t &data)
@@ -68,7 +77,11 @@ int SMBus::read_word(const uint8_t cmd_code, uint16_t &data)
 
 		if (pec != buf[sizeof(buf) - 1]) {
 			result = -EINVAL;
+			perf_count(_interface_errors);
 		}
+
+	} else {
+		perf_count(_interface_errors);
 	}
 
 	return result;
@@ -87,6 +100,10 @@ int SMBus::write_word(const uint8_t cmd_code, uint16_t data)
 
 	int result = transfer(&buf[1], 4, nullptr, 0);
 
+	if (result != PX4_OK) {
+		perf_count(_interface_errors);
+	}
+
 	return result;
 }
 
@@ -99,6 +116,7 @@ int SMBus::block_read(const uint8_t cmd_code, void *data, const uint8_t length, 
 	int result = transfer(&cmd_code, 1, (uint8_t *)&rx_data[3], length + 2);
 
 	if (result != PX4_OK) {
+		perf_count(_interface_errors);
 		return result;
 	}
 
@@ -115,6 +133,7 @@ int SMBus::block_read(const uint8_t cmd_code, void *data, const uint8_t length, 
 
 		if (pec != rx_data[byte_count + 4]) {
 			result = -EINVAL;
+			perf_count(_interface_errors);
 		}
 	}
 
@@ -141,11 +160,12 @@ int SMBus::block_write(const uint8_t cmd_code, void *data, uint8_t byte_count, b
 
 	// If block_write fails, try up to 10 times.
 	while (i < 10 && ((result = transfer((uint8_t *)buf, byte_count + 2, nullptr, 0)) != PX4_OK)) {
+		perf_count(_interface_errors);
 		i++;
 	}
 
 	if (i == 10 || result) {
-		PX4_WARN("Block_write failed %d times", i);
+		//PX4_WARN("Block_write failed %d times", i); removed, it potentially floating the shell
 		result = -EINVAL;
 	}
 
@@ -154,6 +174,9 @@ int SMBus::block_write(const uint8_t cmd_code, void *data, uint8_t byte_count, b
 
 uint8_t SMBus::get_pec(uint8_t *buff, const uint8_t len)
 {
+#ifdef __NUTTX
+	return crc8ccitt(buff, len);
+#else
 	// Initialise CRC to zero.
 	uint8_t crc = 0;
 	uint8_t shift_register = 0;
@@ -177,4 +200,5 @@ uint8_t SMBus::get_pec(uint8_t *buff, const uint8_t len)
 	}
 
 	return crc;
+#endif
 }
