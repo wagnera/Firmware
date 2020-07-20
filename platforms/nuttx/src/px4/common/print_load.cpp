@@ -289,7 +289,7 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 					 tcb_pid,
 					 CONFIG_TASK_NAME_SIZE, tcb_name,
 					 total_runtime[i] / 1000, // us -> ms
-					 (double)current_load * 100,
+					 (double)(current_load * 100.f),
 					 stack_size - stack_free,
 					 stack_size,
 					 tcb_sched_priority,
@@ -375,7 +375,7 @@ static void print_load_callback(void *user)
 	struct print_load_callback_data_s *data = (struct print_load_callback_data_s *)user;
 
 	if (data->fd != STDOUT_FILENO) {
-		memset(clear_line, 0, sizeof(clear_line));
+		clear_line[0] = '\0';
 	}
 
 	dprintf(data->fd, "%s%s\n", clear_line, data->buffer);
