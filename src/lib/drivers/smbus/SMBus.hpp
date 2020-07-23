@@ -49,7 +49,7 @@ class SMBus : public device::I2C
 {
 public:
 	SMBus(int bus_num, uint16_t address);
-	~SMBus();
+	~SMBus() override;
 
 	/**
 	 * @brief Sends a block write command.
