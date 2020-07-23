@@ -93,6 +93,6 @@ public:
 	 */
 	uint8_t get_pec(uint8_t *buffer, uint8_t length);
 
-	perf_counter_t _interface_errors{perf_alloc(PC_COUNT, "smbus_errors")};
+	perf_counter_t _interface_errors{perf_alloc(PC_COUNT, MODULE_NAME": errors")};
 
 };
