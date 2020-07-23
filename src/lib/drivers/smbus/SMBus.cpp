@@ -44,9 +44,6 @@
  *  - Add remaining SMBus protocol messages as needed
  */
 
-#ifdef __NUTTX
-#include <crc8.h>
-#endif
 #include "SMBus.hpp"
 
 SMBus::SMBus(int bus_num, uint16_t address) :
@@ -173,9 +170,8 @@ int SMBus::block_write(const uint8_t cmd_code, const void *data, uint8_t byte_co
 
 uint8_t SMBus::get_pec(uint8_t *buff, const uint8_t len)
 {
-#ifdef __NUTTX
-	return crc8ccitt(buff, len);
-#else
+	// TODO: use "return crc8ccitt(buff, len);"
+
 	// Initialise CRC to zero.
 	uint8_t crc = 0;
 	uint8_t shift_register = 0;
@@ -199,5 +195,4 @@ uint8_t SMBus::get_pec(uint8_t *buff, const uint8_t len)
 	}
 
 	return crc;
-#endif
 }
