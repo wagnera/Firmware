@@ -44,8 +44,6 @@
 
 #include "batt_smbus.h"
 
-#include <lib/parameters/param.h>
-
 extern "C" __EXPORT int batt_smbus_main(int argc, char *argv[]);
 
 BATT_SMBUS::BATT_SMBUS(I2CSPIBusOption bus_option, const int bus, SMBus *interface) :
@@ -57,8 +55,9 @@ BATT_SMBUS::BATT_SMBUS(I2CSPIBusOption bus_option, const int bus, SMBus *interfa
 
 	int battsource = 1;
 	int batt_device_type = (int)SMBUS_DEVICE_TYPE::UNDEFINED;
-	param_set((param_t)(px4::params::BAT_SOURCE), &battsource);
-	param_get((param_t)(px4::params::BAT_MODEL), &batt_device_type);
+
+	param_set(param_find("BAT_SOURCE"), &battsource);
+	param_get(param_find("BAT_SMBUS_MODEL"), &batt_device_type);
 
 
 	//TODO: probe the device and autodetect its type
@@ -87,7 +86,7 @@ BATT_SMBUS::~BATT_SMBUS()
 	}
 
 	int battsource = 0;
-	param_set((param_t)(px4::params::BAT_SOURCE), &battsource);
+	param_set(param_find("BAT_SOURCE"), &battsource);
 }
 
 void BATT_SMBUS::RunImpl()
@@ -359,13 +358,13 @@ int BATT_SMBUS::get_startup_info()
 	int ret = PX4_OK;
 
 	// Read battery threshold params on startup.
-	param_get((param_t)(px4::params::BAT_CRIT_THR), &_crit_thr);
-	param_get((param_t)(px4::params::BAT_LOW_THR), &_low_thr);
-	param_get((param_t)(px4::params::BAT_EMERGEN_THR), &_emergency_thr);
-	param_get((param_t)(px4::params::BAT_C_MULT), &_c_mult);
+	param_get(param_find("BAT_CRIT_THR"), &_crit_thr);
+	param_get(param_find("BAT_LOW_THR"), &_low_thr);
+	param_get(param_find("BAT_EMERGEN_THR"), &_emergency_thr);
+	param_get(param_find("BAT_C_MULT"), &_c_mult);
 
 	int32_t cell_count_param = 0;
-	param_get((param_t)(px4::params::BAT_N_CELLS), &cell_count_param);
+	param_get(param_find("BAT_N_CELLS"), &cell_count_param);
 	_cell_count = (uint8_t)cell_count_param;
 
 	ret |= _interface->block_read(BATT_SMBUS_MANUFACTURER_NAME, _manufacturer_name, BATT_SMBUS_MANUFACTURER_NAME_SIZE,

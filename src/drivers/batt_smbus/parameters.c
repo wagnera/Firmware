@@ -58,7 +58,7 @@ PARAM_DEFINE_FLOAT(BAT_C_MULT, 1.0f);
  * @max 2
  * @group Sensors
  * @value 0 AutoDetect
- * @value 1 BQ40Z50
- * @value 2 BQ40Z80
+ * @value 1 BQ40Z50 based
+ * @value 2 BQ40Z80 based
  */
-PARAM_DEFINE_INT32(BAT_MODEL, 0);
+PARAM_DEFINE_INT32(BAT_SMBUS_MODEL, 0);
